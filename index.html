@@ -9,22 +9,18 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
 -->
 
 <html>
-
 <head>
   <meta name="description" content="DevLabs - Get driving directions" />
   <meta charset="utf-8" />
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>ArcGIS Developer Guide: Find a route</title>
   <style>
-    html,
-    body,
-    #viewDiv {
+    html, body, #viewDiv {
       padding: 0;
       margin: 0;
       height: 100%;
       width: 100%;
     }
-
     .esri-view .esri-directions {
       max-height: calc(100vh - 90px) !important;
     }
@@ -40,6 +36,7 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       SimpleMarkerSymbol,
       RouteLayer,
       Expand,
+      FeatureLayer
     ] = await $arcgis.import([
       "@arcgis/core/config.js",
       "@arcgis/core/Map.js",
@@ -48,34 +45,43 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
       "@arcgis/core/symbols/SimpleMarkerSymbol.js",
       "@arcgis/core/layers/RouteLayer.js",
       "@arcgis/core/widgets/Expand.js",
-    ])
-    esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf"
+      "@arcgis/core/layers/FeatureLayer.js"
+    ]);
+
+    esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
+
     const routeLayer = new RouteLayer({
       url: "https://spgis.sigsa.info/server/rest/services/Version/Rutas/NAServer/Route",
-    })
+    });
+
     const map = new Map({
       basemap: "arcgis/outdoor",
       layers: [routeLayer],
-    })
+    });
+
     const view = new MapView({
       container: "viewDiv",
       map: map,
-      center: [-99.1332, 19.4326],
+      center: [-99.1332, 19.4326], // CDMX
       zoom: 12,
-      constraints: {
-        snapToZoom: false,
-      },
-    })
+      constraints: { snapToZoom: false }
+    });
+
+    // Widget de direcciones
     const directions = new Directions({
       view: view,
       layer: routeLayer,
-    })
-    })
+    });
+
+    // Tu red de caminos como FeatureLayer
     const rutapau = new FeatureLayer({
       url: "https://spgis.sigsa.info/server/rest/services/Map4/MapServer/6",
       title: "RedNA",
       opacity: 0.8
-    })
+    });
+    map.add(rutapau);
+
+    // Expand con el widget de direcciones
     view.ui.add(
       new Expand({
         view: view,
@@ -83,32 +89,11 @@ https://developers.arcgis.com/documentation/security-and-authentication/get-star
         expanded: true,
       }),
       "top-right"
-    )
-    //  function createStopSymbol(outline, fill, size) {
-    //   return new SimpleMarkerSymbol({
-    //     style: "circle",
-    //     size: size,
-    //     outline: {
-    //       width: "2px",
-    //       color: outline
-    //     },
-    //     color: fill
-    //   });
-    // }
-    //  // Stop symbols
-    //   directions.routeStopSymbol.first = createStopSymbol("black","white","12px");
-    //   directions.routeStopSymbol.middle = createStopSymbol("grey","white","10px");
-    //   directions.routeStopSymbol.last = createStopSymbol("white","black","12px");
-    // // Route symbol
-    //   directions.directionsLine.width = "5";
-    //   directions.directionsLine.color = [50,150,255,.75];
-    //   directions.directionsLine.style = "solid";
+    );
   </script>
 </head>
-
 <body>
   <div id="viewDiv"></div>
 </body>
-
-
 </html>
+
