@@ -1,99 +1,68 @@
-<!--
-
-To run this demo, you need to replace 'YOUR_ACCESS_TOKEN' with an access token from ArcGIS that has the correct privileges.
-
-To get started, sign up for a free ArcGIS Location Platform account or a free trial of ArcGIS Online and create developer credentials.
-
-https://developers.arcgis.com/documentation/security-and-authentication/get-started/
-
--->
-
 <html>
 <head>
-  <meta name="description" content="DevLabs - Get driving directions" />
   <meta charset="utf-8" />
-  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>ArcGIS Developer Guide: Find a route</title>
+  <title>Prueba Rutas Pau</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.32/"></script>
   <style>
     html, body, #viewDiv {
-      padding: 0;
-      margin: 0;
       height: 100%;
       width: 100%;
-    }
-    .esri-view .esri-directions {
-      max-height: calc(100vh - 90px) !important;
+      margin: 0;
+      padding: 0;
     }
   </style>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
-  <script src="https://js.arcgis.com/4.32"></script>
-  <script type="module">
-    const [
-      esriConfig,
-      Map,
-      MapView,
-      Directions,
-      SimpleMarkerSymbol,
-      RouteLayer,
-      Expand,
-      FeatureLayer
-    ] = await $arcgis.import([
-      "@arcgis/core/config.js",
-      "@arcgis/core/Map.js",
-      "@arcgis/core/views/MapView.js",
-      "@arcgis/core/widgets/Directions.js",
-      "@arcgis/core/symbols/SimpleMarkerSymbol.js",
-      "@arcgis/core/layers/RouteLayer.js",
-      "@arcgis/core/widgets/Expand.js",
-      "@arcgis/core/layers/FeatureLayer.js"
-    ]);
-
-    esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
-
-    const routeLayer = new RouteLayer({
-      url: "https://spgis.sigsa.info/server/rest/services/Version/Rutas/NAServer/Route",
-    });
-
-    const map = new Map({
-      basemap: "arcgis/outdoor",
-      layers: [routeLayer],
-    });
-
-    const view = new MapView({
-      container: "viewDiv",
-      map: map,
-      center: [-99.1332, 19.4326], // CDMX
-      zoom: 12,
-      constraints: { snapToZoom: false }
-    });
-
-    // Widget de direcciones
-    const directions = new Directions({
-      view: view,
-      layer: routeLayer,
-    });
-
-    // Tu red de caminos como FeatureLayer
-    const rutapau = new FeatureLayer({
-      url: "https://spgis.sigsa.info/server/rest/services/Map4/MapServer/6",
-      title: "RedNA",
-      opacity: 0.8
-    });
-    map.add(rutapau);
-
-    // Expand con el widget de direcciones
-    view.ui.add(
-      new Expand({
-        view: view,
-        content: directions,
-        expanded: true,
-      }),
-      "top-right"
-    );
-  </script>
 </head>
 <body>
   <div id="viewDiv"></div>
+  <script>
+    require([
+      "esri/config",
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/RouteLayer",
+      "esri/layers/FeatureLayer",
+      "esri/widgets/Directions",
+      "esri/widgets/Expand"
+    ], function(esriConfig, Map, MapView, RouteLayer, FeatureLayer, Directions, Expand) {
+
+      esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
+
+      const routeLayer = new RouteLayer({
+        url: "https://spgis.sigsa.info/server/rest/services/Version/Rutas/NAServer/Route"
+      });
+
+      const rutapau = new FeatureLayer({
+        url: "https://spgis.sigsa.info/server/rest/services/Map4/MapServer/6",
+        title: "RedNA",
+        opacity: 0.8
+      });
+
+      const map = new Map({
+        basemap: "arcgis/outdoor",
+        layers: [routeLayer, rutapau]
+      });
+
+      const view = new MapView({
+        container: "viewDiv",
+        map: map,
+        center: [-99.1332, 19.4326], // CDMX
+        zoom: 12
+      });
+
+      const directions = new Directions({
+        view: view,
+        layer: routeLayer
+      });
+
+      const expand = new Expand({
+        view: view,
+        content: directions,
+        expanded: true
+      });
+
+      view.ui.add(expand, "top-right");
+    });
+  </script>
 </body>
 </html>
-
