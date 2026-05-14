@@ -4,6 +4,7 @@
   <title>Demo Rutas SIGSA - Pro</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.32/"></script>
+
   <style>
     html, body, #viewDiv {
       height: 100%;
@@ -25,47 +26,47 @@
       "esri/config",
       "esri/Map",
       "esri/views/MapView",
-      "esri/layers/RouteLayer",
       "esri/layers/FeatureLayer",
       "esri/widgets/Directions",
       "esri/widgets/Expand",
       "esri/widgets/Locate",
       "esri/widgets/LayerList",
-      "esri/widgets/BasemapGallery"
+      "esri/widgets/BasemapGallery",
+      "esri/layers/GraphicsLayer"
     ], function(
       esriConfig,
       Map,
       MapView,
-      RouteLayer,
       FeatureLayer,
       Directions,
       Expand,
       Locate,
       LayerList,
-      BasemapGallery
+      BasemapGallery,
+      GraphicsLayer
     ) {
 
       esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
 
-      // Capas
-      const routeLayer = new RouteLayer({
-        url: "https://spgis.sigsa.info/server/rest/services/Version/Rutas/NAServer/Route",
-        title: "Rutas"
-      });
-
+      // Feature Layer
       const rutapau = new FeatureLayer({
         url: "https://spgis.sigsa.info/server/rest/services/Map4/MapServer/6",
         title: "RedNA",
         opacity: 0.2
       });
 
-      // Mapa
-      const map = new Map({
-        basemap: "arcgis/outdoor",
-        layers: [routeLayer, rutapau]
+      // Layer donde Directions dibuja las rutas
+      const routeLayer = new GraphicsLayer({
+        title: "Rutas"
       });
 
-      // Vista
+      // Map
+      const map = new Map({
+        basemap: "arcgis/outdoor",
+        layers: [rutapau, routeLayer]
+      });
+
+      // View
       const view = new MapView({
         container: "viewDiv",
         map: map,
@@ -73,7 +74,7 @@
         zoom: 12
       });
 
-      // Widget Directions
+      // Directions
       const directions = new Directions({
         view: view,
         layer: routeLayer
@@ -87,7 +88,7 @@
 
       view.ui.add(expandDirections, "top-right");
 
-      // Widget Locate
+      // Locate
       const locate = new Locate({
         view: view,
         useHeadingEnabled: false,
@@ -99,7 +100,7 @@
 
       view.ui.add(locate, "top-left");
 
-      // Widget LayerList para prender/apagar capas
+      // LayerList
       const layerList = new LayerList({
         view: view,
         listItemCreatedFunction: function(event) {
@@ -113,7 +114,7 @@
 
       view.ui.add(layerList, "top-right");
 
-      // ✅ Basemap Gallery (cambiador de mapas base)
+      // Basemap Gallery
       const basemapGallery = new BasemapGallery({
         view: view
       });
