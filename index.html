@@ -1,7 +1,9 @@
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>Demo Rutas SIGSA - Pro</title>
+
   <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.32/"></script>
 
@@ -12,6 +14,7 @@
       margin: 0;
       padding: 0;
     }
+
     .esri-view .esri-directions {
       max-height: calc(100vh - 90px) !important;
     }
@@ -27,23 +30,25 @@
       "esri/Map",
       "esri/views/MapView",
       "esri/layers/FeatureLayer",
+      "esri/layers/GraphicsLayer",
       "esri/widgets/Directions",
       "esri/widgets/Expand",
       "esri/widgets/Locate",
       "esri/widgets/LayerList",
       "esri/widgets/BasemapGallery",
-      "esri/layers/GraphicsLayer"
+      "esri/portal/Portal"
     ], function(
       esriConfig,
       Map,
       MapView,
       FeatureLayer,
+      GraphicsLayer,
       Directions,
       Expand,
       Locate,
       LayerList,
       BasemapGallery,
-      GraphicsLayer
+      Portal
     ) {
 
       esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
@@ -55,7 +60,7 @@
         opacity: 0.2
       });
 
-      // Layer donde Directions dibuja las rutas
+      // Layer donde se dibuja la ruta del widget Directions
       const routeLayer = new GraphicsLayer({
         title: "Rutas"
       });
@@ -74,7 +79,7 @@
         zoom: 12
       });
 
-      // Directions
+      // Directions widget
       const directions = new Directions({
         view: view,
         layer: routeLayer
@@ -88,7 +93,7 @@
 
       view.ui.add(expandDirections, "top-right");
 
-      // Locate
+      // Locate widget
       const locate = new Locate({
         view: view,
         useHeadingEnabled: false,
@@ -100,7 +105,7 @@
 
       view.ui.add(locate, "top-left");
 
-      // LayerList
+      // LayerList widget
       const layerList = new LayerList({
         view: view,
         listItemCreatedFunction: function(event) {
@@ -114,9 +119,17 @@
 
       view.ui.add(layerList, "top-right");
 
-      // Basemap Gallery
+      // Portal (para asegurar que BasemapGallery cargue basemaps)
+      const portal = new Portal({
+        url: "https://www.arcgis.com"
+      });
+
+      // Basemap Gallery widget
       const basemapGallery = new BasemapGallery({
-        view: view
+        view: view,
+        source: {
+          portal: portal
+        }
       });
 
       const expandBasemap = new Expand({
