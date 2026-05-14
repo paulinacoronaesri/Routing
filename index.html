@@ -16,8 +16,10 @@
     }
   </style>
 </head>
+
 <body>
   <div id="viewDiv"></div>
+
   <script>
     require([
       "esri/config",
@@ -28,8 +30,20 @@
       "esri/widgets/Directions",
       "esri/widgets/Expand",
       "esri/widgets/Locate",
-      "esri/widgets/LayerList"
-    ], function(esriConfig, Map, MapView, RouteLayer, FeatureLayer, Directions, Expand, Locate, LayerList) {
+      "esri/widgets/LayerList",
+      "esri/widgets/BasemapGallery"
+    ], function(
+      esriConfig,
+      Map,
+      MapView,
+      RouteLayer,
+      FeatureLayer,
+      Directions,
+      Expand,
+      Locate,
+      LayerList,
+      BasemapGallery
+    ) {
 
       esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
 
@@ -64,11 +78,13 @@
         view: view,
         layer: routeLayer
       });
+
       const expandDirections = new Expand({
         view: view,
         content: directions,
         expanded: true
       });
+
       view.ui.add(expandDirections, "top-right");
 
       // Widget Locate
@@ -80,6 +96,7 @@
           return view.goTo(options.target);
         }
       });
+
       view.ui.add(locate, "top-left");
 
       // Widget LayerList para prender/apagar capas
@@ -87,17 +104,29 @@
         view: view,
         listItemCreatedFunction: function(event) {
           const item = event.item;
-          // Puedes personalizar títulos, iconos, etc.
           item.panel = {
             content: "legend",
             open: false
           };
         }
       });
+
       view.ui.add(layerList, "top-right");
+
+      // ✅ Basemap Gallery (cambiador de mapas base)
+      const basemapGallery = new BasemapGallery({
+        view: view
+      });
+
+      const expandBasemap = new Expand({
+        view: view,
+        content: basemapGallery,
+        expanded: false
+      });
+
+      view.ui.add(expandBasemap, "top-left");
 
     });
   </script>
 </body>
 </html>
-
