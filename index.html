@@ -16,7 +16,7 @@
     }
 
     .esri-view .esri-directions {
-      max-height: calc(100vh - 90px) !important;
+      max-height: calc(100vh - 120px) !important;
     }
   </style>
 </head>
@@ -51,7 +51,7 @@
       Portal
     ) {
 
-        esriConfig.apiKey = "axZTBFQLdTUVrZeBShQjr6A..QXhUhP1lV3ToX131wQGStoZ0DtyNNl9zQsS3pBg9hJBKc0EFYzA6dxxecrbPCQd4A9AHerJuk7NNGAkwU8S5KyR00I0vqE1eJNDPUyzAKbsDuNc3osOcPMrsnZjUFJa8cwkiTssKZA6AJVcu3wf3S8x7vhu9Z8m6KfhuJv9pAmAadK6Zea8fk78MZExAbv44VA..";
+      esriConfig.apiKey = "AAPKa706d18d6c6544cdaa4f7c96dd309c72iyX0J4PvCp3K13GZeHhOl-acWns6EFhfoOr2HY0ghLdtd3osENUGrckZjhcwztAf";
 
       // Feature Layer
       const rutapau = new FeatureLayer({
@@ -60,7 +60,7 @@
         opacity: 0.2
       });
 
-      // Layer donde se dibuja la ruta del widget Directions
+      // Graphics Layer para dibujar rutas
       const routeLayer = new GraphicsLayer({
         title: "Rutas"
       });
@@ -79,7 +79,7 @@
         zoom: 12
       });
 
-      // Directions widget
+      // DIRECTIONS
       const directions = new Directions({
         view: view,
         layer: routeLayer
@@ -88,12 +88,10 @@
       const expandDirections = new Expand({
         view: view,
         content: directions,
-        expanded: true
+        expanded: false
       });
 
-      view.ui.add(expandDirections, "top-right");
-
-      // Locate widget
+      // LOCATE
       const locate = new Locate({
         view: view,
         useHeadingEnabled: false,
@@ -103,28 +101,22 @@
         }
       });
 
-      view.ui.add(locate, "top-left");
-
-      // LayerList widget
+      // LAYERLIST
       const layerList = new LayerList({
-        view: view,
-        listItemCreatedFunction: function(event) {
-          const item = event.item;
-          item.panel = {
-            content: "legend",
-            open: false
-          };
-        }
+        view: view
       });
 
-      view.ui.add(layerList, "top-right");
+      const expandLayerList = new Expand({
+        view: view,
+        content: layerList,
+        expanded: false
+      });
 
-      // Portal (para asegurar que BasemapGallery cargue basemaps)
+      // BASEMAP GALLERY
       const portal = new Portal({
         url: "https://www.arcgis.com"
       });
 
-      // Basemap Gallery widget
       const basemapGallery = new BasemapGallery({
         view: view,
         source: {
@@ -138,7 +130,12 @@
         expanded: false
       });
 
-      view.ui.add(expandBasemap, "top-left");
+      // --- UI ADD (ordenados bonito) ---
+      view.ui.add(locate, "top-left");
+
+      view.ui.add([expandBasemap, expandLayerList], "top-left");
+
+      view.ui.add(expandDirections, "top-right");
 
     });
   </script>
