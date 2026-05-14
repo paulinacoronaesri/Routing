@@ -1,12 +1,9 @@
-<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>Demo Rutas SIGSA - Pro</title>
-
   <link rel="stylesheet" href="https://js.arcgis.com/4.32/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.32/"></script>
-
   <style>
     html, body, #viewDiv {
       height: 100%;
@@ -14,64 +11,47 @@
       margin: 0;
       padding: 0;
     }
-
     .esri-view .esri-directions {
-      max-height: calc(100vh - 120px) !important;
+      max-height: calc(100vh - 90px) !important;
     }
   </style>
 </head>
-
 <body>
   <div id="viewDiv"></div>
-
   <script>
     require([
       "esri/config",
       "esri/Map",
       "esri/views/MapView",
+      "esri/layers/RouteLayer",
       "esri/layers/FeatureLayer",
-      "esri/layers/GraphicsLayer",
       "esri/widgets/Directions",
       "esri/widgets/Expand",
       "esri/widgets/Locate",
-      "esri/widgets/LayerList",
-      "esri/widgets/BasemapGallery",
-      "esri/portal/Portal"
-    ], function(
-      esriConfig,
-      Map,
-      MapView,
-      FeatureLayer,
-      GraphicsLayer,
-      Directions,
-      Expand,
-      Locate,
-      LayerList,
-      BasemapGallery,
-      Portal
-    ) {
+      "esri/widgets/LayerList"
+    ], function(esriConfig, Map, MapView, RouteLayer, FeatureLayer, Directions, Expand, Locate, LayerList) {
 
       esriConfig.apiKey = "axZTBFQLdTUVrZeBShQjr6A..QXhUhP1lV3ToX131wQGStoZ0DtyNNl9zQsS3pBg9hJBKc0EFYzA6dxxecrbPCQd4A9AHerJuk7NNGAkwU8S5KyR00I0vqE1eJNDPUyzAKbsDuNc3osOcPMrsnZjUFJa8cwkiTssKZA6AJVcu3wf3S8x7vhu9Z8m6KfhuJv9pAmAadK6Zea8fk78MZExAbv44VA..";
 
-      // Feature Layer
+      // Capas
+      const routeLayer = new RouteLayer({
+        url: "https://spgis.sigsa.info/server/rest/services/Version/Rutas/NAServer/Route",
+        title: "Rutas"
+      });
+
       const rutapau = new FeatureLayer({
         url: "https://spgis.sigsa.info/server/rest/services/Map4/MapServer/6",
         title: "RedNA",
         opacity: 0.2
       });
 
-      // Graphics Layer para dibujar rutas
-      const routeLayer = new GraphicsLayer({
-        title: "Rutas"
-      });
-
-      // Map
+      // Mapa
       const map = new Map({
-        basemap: "streets-navigation-vector",
-        layers: [rutapau, routeLayer]
+        basemap: "arcgis/outdoor",
+        layers: [routeLayer, rutapau]
       });
 
-      // View
+      // Vista
       const view = new MapView({
         container: "viewDiv",
         map: map,
@@ -79,19 +59,19 @@
         zoom: 12
       });
 
-      // DIRECTIONS
+      // Widget Directions
       const directions = new Directions({
         view: view,
         layer: routeLayer
       });
-
       const expandDirections = new Expand({
         view: view,
         content: directions,
-        expanded: false
+        expanded: true
       });
+      view.ui.add(expandDirections, "top-right");
 
-      // LOCATE
+      // Widget Locate
       const locate = new Locate({
         view: view,
         useHeadingEnabled: false,
@@ -100,42 +80,21 @@
           return view.goTo(options.target);
         }
       });
-
-      // LAYERLIST
-      const layerList = new LayerList({
-        view: view
-      });
-
-      const expandLayerList = new Expand({
-        view: view,
-        content: layerList,
-        expanded: false
-      });
-
-      // BASEMAP GALLERY
-      const portal = new Portal({
-        url: "https://www.arcgis.com"
-      });
-
-      const basemapGallery = new BasemapGallery({
-        view: view,
-        source: {
-          portal: portal
-        }
-      });
-
-      const expandBasemap = new Expand({
-        view: view,
-        content: basemapGallery,
-        expanded: false
-      });
-
-      // --- UI ADD (ordenados bonito) ---
       view.ui.add(locate, "top-left");
 
-      view.ui.add([expandBasemap, expandLayerList], "top-left");
-
-      view.ui.add(expandDirections, "top-right");
+      // Widget LayerList para prender/apagar capas
+      const layerList = new LayerList({
+        view: view,
+        listItemCreatedFunction: function(event) {
+          const item = event.item;
+          // Puedes personalizar títulos, iconos, etc.
+          item.panel = {
+            content: "legend",
+            open: false
+          };
+        }
+      });
+      view.ui.add(layerList, "top-right");
 
     });
   </script>
